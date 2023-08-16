@@ -1,12 +1,11 @@
 import argparse
 import gradio as gr
 from interest import *
-def compound(principal,age,salary,saving,debt,promotions,inflation=1.05):
-    savings = Assets(float(principal),float(age),float(salary),float(saving),float(inflation))
+def compound(principal,age,salary,saving,debt,promotions,inflation=1.05,returns=1.10,four01k=7500):
+    savings = Assets(float(principal),float(age),float(salary),float(saving),float(inflation),float(returns),float(four01k))
+    savings.debt_horizon(debt)
     return savings.compound_interest()
     
-def filter_records(records, gender):
-    return records[records["gender"] == gender]
 
 
 def main():
@@ -16,11 +15,14 @@ def main():
         salary = gr.Textbox(label="salary")
         saving = gr.Textbox(label="saving")
         inflation = gr.Textbox(label="inflation")
+        returns = gr.Textbox(label="expected investment returns")
+
+        four01k = gr.Textbox(label="401k contribution this includes employer match this is subtracted from yearly save goal")
 
         
         
         debt = gr.Dataframe(
-                headers=["name", "Ammount", "interest","payment per month"],
+                headers=["name", "Amount", "interest","payment per month"],
                 datatype=["str", "number", "number","number"],
                 row_count=3,
                 col_count=(4, "fixed"),
@@ -37,7 +39,7 @@ def main():
         greet_btn = gr.Button("calculate")
         output = gr.Textbox(label="Output Box")
 
-        greet_btn.click(fn=compound, inputs=[principal,age,salary,saving,debt,promotions,inflation], outputs=output, api_name="calculate")
+        greet_btn.click(fn=compound, inputs=[principal,age,salary,saving,debt,promotions,inflation,returns,four01k], outputs=output, api_name="calculate")
 
     demo.demo = gr.Interface(fn=compound, inputs="text", outputs="text")
     demo.launch() 
