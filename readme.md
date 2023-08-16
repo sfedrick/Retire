@@ -12,6 +12,8 @@ Inflation adjusts money for the first year entered. I.e if you entered your age 
 
 Debt money isn't assumed to keep up with inflation. We assume you are performing constant payments over the coarse of your loan. So we don't require you to increase debt money with inflation once it frees up in the same way we do with normal yearly savings.
 
+All textboxes with a star require input in order to run the app
+
 # Debt payoff 
 I include an option to enter debts and the speed at which you pay them off. Once this debt is paid off the money once used to pay off the debt is added to your savings.
 

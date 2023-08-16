@@ -1,6 +1,6 @@
 import pandas as pd
 import pdb
-
+from datetime import date
 class Assets:
     def __init__(self,principal,age,salary,saving,inflation=1.05,returns=1.10,four01k=7500,birth_year = 1998,years=100):
         self.principal = principal
@@ -11,13 +11,20 @@ class Assets:
         self.saving = saving
         self.returns = returns
         self.inflation_rate = inflation
-        self.current_year = birth_year + age
         self.inflation_csv = pd.read_csv("inflation.csv")
         self.debt_money_end =[]
         self.promotion_earnings =[]
         self.four01k = four01k
-        self.birth = birth_year
         self.windfalls = []
+        
+        try:
+            today = date.today()
+            self.current_year = float(today.year)
+            self.birth = self.current_year - self.age
+        except:
+            self.current_year = birth_year + age
+            self.birth = birth_year
+
         
         pass
     
