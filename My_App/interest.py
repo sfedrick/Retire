@@ -13,7 +13,9 @@ class Assets:
         self.current_year = birth_year + age
         self.inflation_csv = pd.read_csv("inflation.csv")
         self.debt_money_end =[]
+        self.promotion_earnings =[]
         self.four01k = four01k
+        self.birth = birth_year
         
         pass
     
@@ -54,8 +56,28 @@ class Assets:
             debt_interest = float(debt.loc[i,'interest'])
             year_end = self.loan_end(debt_ammount,debt_payment,debt_interest)
             self.debt_money_end.append([year_end+self.current_year,debt_payment])
+    def promotion_money(self,year,promotion_year,salaryincrease):
+        if(year>=promotion_year):
+            return salaryincrease
+        else :
+            return 0
+
+    def promotion_extraction(self,promotion):
+        row_size = promotion.shape[0]
+        for i in range(row_size ):
+            try:
+                promotion_age = float(promotion.loc[i,'age'])
+                promotion_salary = float(promotion.loc[i,'Salary increase post-tax'])
+                promotion_salary_tax = float(promotion.loc[i,'taxrate of new money'])
+                self.promotion_earnings.append([promotion_age+ self.birth,promotion_salary,promotion_salary/promotion_salary_tax])
+            except ValueError:
+                print("You have an unused promotion row")
+            except ZeroDivisionError:
+                print("You're attempting to divide by zero")
+
+
+
             
-        
 
     def compound_interest(self)->str:
         output =""
@@ -66,6 +88,10 @@ class Assets:
             year_save = self.saving + self.four01k
             for item in self.debt_money_end:
                 year_save = year_save + self.debt_free_money(self.current_year+i,item[0],item[1])
+
+            for item in self.promotion_earnings:
+                year_save = year_save + self.promotion_money(self.current_year+i,item[0],item[1])
+                salary_needed = salary_needed+ self.promotion_money(self.current_year+i,item[0],item[2])
 
             principal = (self.principal+year_save*inflation)*self.returns
             self.principal = principal

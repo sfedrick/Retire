@@ -4,6 +4,7 @@ from interest import *
 def compound(principal,age,salary,saving,debt,promotions,inflation=1.05,returns=1.10,four01k=7500):
     savings = Assets(float(principal),float(age),float(salary),float(saving),float(inflation),float(returns),float(four01k))
     savings.debt_horizon(debt)
+    savings.promotion_extraction(promotions)
     return savings.compound_interest()
     
 
@@ -29,9 +30,9 @@ def main():
                 label ="Debts please enter your debts. Once a debt is paid off money goes into savings."
             )
         promotions = gr.Dataframe(
-                headers=["age", "Salary increase pre-tax","taxrate of new money"],
+                headers=["age", "Salary increase post-tax","taxrate of new money"],
                 datatype=["number", "number","number"],
-                row_count=2,
+                row_count=1,
                 col_count=(3, "fixed"),
                 label ="Promotions please enter your promotions all money from promotions are put into savings "
                 
@@ -41,7 +42,7 @@ def main():
 
         greet_btn.click(fn=compound, inputs=[principal,age,salary,saving,debt,promotions,inflation,returns,four01k], outputs=output, api_name="calculate")
 
-    demo.demo = gr.Interface(fn=compound, inputs="text", outputs="text")
+    demo.demo = gr.Interface(fn=compound, inputs="text", outputs="text",allow_flagging="manual")
     demo.launch() 
 
 if __name__ == "__main__":
