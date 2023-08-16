@@ -2,8 +2,9 @@ import pandas as pd
 import pdb
 
 class Assets:
-    def __init__(self,principal,age,salary,saving,inflation=1.05,returns=1.10,four01k=7500,years=100, birth_year = 1998):
+    def __init__(self,principal,age,salary,saving,inflation=1.05,returns=1.10,four01k=7500,birth_year = 1998,years=100):
         self.principal = principal
+        self.inflation_adjusted_principal = principal
         self.age = age 
         self.salary =salary
         self.years = years
@@ -16,6 +17,7 @@ class Assets:
         self.promotion_earnings =[]
         self.four01k = four01k
         self.birth = birth_year
+        self.windfalls = []
         
         pass
     
@@ -56,6 +58,7 @@ class Assets:
             debt_interest = float(debt.loc[i,'interest'])
             year_end = self.loan_end(debt_ammount,debt_payment,debt_interest)
             self.debt_money_end.append([year_end+self.current_year,debt_payment])
+
     def promotion_money(self,year,promotion_year,salaryincrease):
         if(year>=promotion_year):
             return salaryincrease
@@ -75,28 +78,63 @@ class Assets:
             except ZeroDivisionError:
                 print("You're attempting to divide by zero")
 
+    def windfall_money(self,year,windfall_year,money):
+        if(year==windfall_year):
+            return money
+        else :
+            return 0
 
-
-            
+    def windfall_extraction(self,windfall):
+        row_size = windfall.shape[0]
+        for i in range(row_size):
+                windfall_age = float(windfall.loc[i,'age'])
+                windfall_money= float(windfall.loc[i,'windfall or payment'])
+                self.windfalls.append([windfall_age+self.birth,windfall_money])
+                    
 
     def compound_interest(self)->str:
         output =""
+        inflated_salary = self.salary
+        inflated_year_save = self.saving + self.four01k
         inflation = 1
+        one_time_payment = 0
+        debt_money = 0
         for i in range(self.years):
-            inflation = self.inflation_calculate(self.current_year+i)*inflation
+            if(i>0):
+                inflation = self.inflation_calculate(self.current_year+i)*inflation
+            else:
+                pass
+
             salary_needed = self.salary
             year_save = self.saving + self.four01k
+
             for item in self.debt_money_end:
-                year_save = year_save + self.debt_free_money(self.current_year+i,item[0],item[1])
+                debt_money = debt_money+self.debt_free_money(self.current_year+i,item[0],item[1])
 
             for item in self.promotion_earnings:
-                year_save = year_save + self.promotion_money(self.current_year+i,item[0],item[1])
-                salary_needed = salary_needed+ self.promotion_money(self.current_year+i,item[0],item[2])
+                money_increase = self.promotion_money(self.current_year+i,item[0],item[1])
+                year_save = year_save + money_increase
+                sal_increase = self.promotion_money(self.current_year+i,item[0],item[2])
+                salary_needed = salary_needed + sal_increase 
+                inflated_salary = inflated_salary + sal_increase 
 
-            principal = (self.principal+year_save*inflation)*self.returns
+            for item in self.windfalls:
+                one_time_payment = one_time_payment + self.windfall_money(self.current_year+i,item[0],item[1])
+            
+            if(i>0):
+                principal = (self.principal+year_save*inflation + debt_money)*self.returns + one_time_payment
+            else:
+                principal = (self.principal+year_save*inflation + debt_money) + one_time_payment
+
             self.principal = principal
-            string1 = "year %d: principal %.2f saved %d money"%(i+1+self.age, principal,year_save*inflation)
-            string2 = "Inflation adjusted dollars : principal %.2f saved %d money monthly save %.2f"%( principal/inflation,year_save*inflation,(year_save*inflation-self.four01k)/12)
-            string3 = "Salary 2023 %d inflated salary %d"%(salary_needed,salary_needed*inflation)
+            inflation_adjusted_principal = principal/inflation
+            inflated_salary = salary_needed*inflation 
+            inflated_year_save = year_save*inflation + debt_money 
+            one_time_payment = 0
+            debt_money = 0
+
+            string1 = "year %d: principal %.2f saved %d money"%(i+self.age, principal,inflated_year_save)
+            string2 = "Inflation adjusted dollars : principal %.2f saved %d money monthly save %.2f"%(inflation_adjusted_principal,inflated_year_save,(inflated_year_save -self.four01k)/12)
+            string3 = "Salary 2023 %d inflated salary %d"%(salary_needed,inflated_salary)
             output = output+"\n"+string1+"\n"+string2+"\n"+string3 +"\n"
         return output
