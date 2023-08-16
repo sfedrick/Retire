@@ -32,10 +32,10 @@ def main():
                 label ="Debts please enter your debts. Once a debt is paid off money goes into savings."
             )
         promotions = gr.Dataframe(
-                headers=["name","age", "Salary increase post-tax","taxrate of new money"],
-                datatype=["str","number", "number","number"],
+                headers=["name","age", "Salary increase post-tax"],
+                datatype=["str","number", "number"],
                 row_count=1,
-                col_count=(4, "fixed"),
+                col_count=(3, "fixed"),
                 label ="Promotions please enter your promotions all money from promotions are put into savings "  
             )
         windfall = gr.Dataframe(

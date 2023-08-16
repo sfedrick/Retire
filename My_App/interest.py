@@ -71,9 +71,7 @@ class Assets:
             try:
                 promotion_age = float(promotion.loc[i,'age'])
                 promotion_salary = float(promotion.loc[i,'Salary increase post-tax'])
-                promotion_salary_tax = float(promotion.loc[i,'taxrate of new money'])
-                self.promotion_earnings.append([promotion_age+ self.birth,promotion_salary,promotion_salary/promotion_salary_tax])
-            except ValueError:
+                self.promotion_earnings.append([promotion_age+ self.birth,promotion_salary])
                 print("You have an unused promotion row")
             except ZeroDivisionError:
                 print("You're attempting to divide by zero")
@@ -114,9 +112,7 @@ class Assets:
             for item in self.promotion_earnings:
                 money_increase = self.promotion_money(self.current_year+i,item[0],item[1])
                 year_save = year_save + money_increase
-                sal_increase = self.promotion_money(self.current_year+i,item[0],item[2])
-                salary_needed = salary_needed + sal_increase 
-                inflated_salary = inflated_salary + sal_increase 
+                salary_needed = salary_needed + money_increase
 
             for item in self.windfalls:
                 one_time_payment = one_time_payment + self.windfall_money(self.current_year+i,item[0],item[1])
@@ -134,7 +130,7 @@ class Assets:
             debt_money = 0
 
             string1 = "year %d: principal %.2f saved %d money"%(i+self.age, principal,inflated_year_save)
-            string2 = "Inflation adjusted dollars : principal %.2f saved %d money monthly save %.2f"%(inflation_adjusted_principal,inflated_year_save,(inflated_year_save -self.four01k)/12)
-            string3 = "Salary 2023 %d inflated salary %d"%(salary_needed,inflated_salary)
+            string2 = "Inflation adjusted dollars : principal %.2f money saved: %.2f money monthly save %.2f"%(inflation_adjusted_principal,inflated_year_save,(inflated_year_save -self.four01k)/12)
+            string3 = "Post tax Salary %d: %d inflated salary: %d"%(self.age+self.birth,salary_needed,inflated_salary)
             output = output+"\n"+string1+"\n"+string2+"\n"+string3 +"\n"
         return output
