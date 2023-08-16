@@ -57,7 +57,7 @@ def main():
         greet_btn.click(fn=compound, inputs=[principal,age,salary,saving,debt,promotions,windfall,inflation,returns,four01k], outputs=output, api_name="calculate")
 
     demo.demo = gr.Interface(fn=compound, inputs="text", outputs="text")
-    demo.launch() 
+    demo.launch(share="true") 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
