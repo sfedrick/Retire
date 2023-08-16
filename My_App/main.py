@@ -15,7 +15,7 @@ def main():
         principal = gr.Textbox(label="Principal")
         age = gr.Textbox(label="Age")
         birth_year = gr.Textbox(label="Birth year")
-        salary = gr.Textbox(label="salary")
+        salary = gr.Textbox(label="take home salary")
         saving = gr.Textbox(label="saving")
         inflation = gr.Textbox(label="inflation")
         returns = gr.Textbox(label="expected investment returns")
