@@ -1,7 +1,7 @@
 This is a my customized retirement app calculater. 
 
 First run the following command 
-<code>chmod +x activate_first_time.sh</code>
+<code>chmod +x set_up.sh</code>
 
 then run the code using <code>./run_app</code>
 
