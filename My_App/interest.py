@@ -2,8 +2,8 @@ import pandas as pd
 import pdb
 from datetime import date
 class Assets:
-    def __init__(self,principal,age,salary,saving,inflation=1.05,returns=1.10,four01k=7500,birth_year = 1998,years=100):
-        self.principal = principal
+    def __init__(self,principal,age,salary,saving,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,birth_year = 1998,years=100):
+        self.principal = principal + four01k_total
         self.inflation_adjusted_principal = principal
         self.age = age 
         self.salary =salary
@@ -15,6 +15,7 @@ class Assets:
         self.debt_money_end =[]
         self.promotion_earnings =[]
         self.four01k = four01k
+        self.four01k_total = four01k_total
         self.windfalls = []
         
         try:
@@ -100,10 +101,11 @@ class Assets:
     def compound_interest(self)->str:
         output =""
         inflated_salary = self.salary
-        inflated_year_save = self.saving + self.four01k
+        inflated_year_save = self.saving 
         inflation = 1
         one_time_payment = 0
         debt_money = 0
+        four01k_total = self.four01k_total
         for i in range(self.years):
             if(i>0):
                 inflation = self.inflation_calculate(self.current_year+i)*inflation
@@ -111,7 +113,7 @@ class Assets:
                 pass
 
             salary_needed = self.salary
-            year_save = self.saving + self.four01k
+            year_save = self.saving 
 
             for item in self.debt_money_end:
                 debt_money = debt_money+self.debt_free_money(self.current_year+i,item[0],item[1])
@@ -125,19 +127,25 @@ class Assets:
                 one_time_payment = one_time_payment + self.windfall_money(self.current_year+i,item[0],item[1])
             
             if(i>0):
-                principal = (self.principal+year_save*inflation + debt_money)*self.returns + one_time_payment
+                principal = (self.principal+year_save*inflation + debt_money + self.four01k)*self.returns + one_time_payment
+                four01k_total = (four01k_total+ self.four01k)*self.returns
             else:
-                principal = (self.principal+year_save*inflation + debt_money) + one_time_payment
-
+                principal = (self.principal) + one_time_payment
+                four01k_total = (four01k_total)
             self.principal = principal
             inflation_adjusted_principal = principal/inflation
             inflated_salary = salary_needed*inflation 
-            inflated_year_save = year_save*inflation + debt_money 
-            one_time_payment = 0
-            debt_money = 0
+            inflated_year_save = year_save*inflation 
+            
 
             string1 = "year %d: principal %.2f saved %d money"%(i+self.age, principal,inflated_year_save)
-            string2 = "Inflation adjusted dollars : principal %.2f money saved: %.2f money monthly save %.2f"%(inflation_adjusted_principal,inflated_year_save,(inflated_year_save -self.four01k)/12)
+            string2 = "Inflation adjusted dollars : principal %.2f money saved: %.2f money monthly save %.2f"%(inflation_adjusted_principal,inflated_year_save,(inflated_year_save)/12)
             string3 = "Post tax Salary %d: %d inflated salary: %d"%(self.age+self.birth,salary_needed,inflated_salary)
-            output = output+"\n"+string1+"\n"+string2+"\n"+string3 +"\n"
+            try:
+                string4 = "total 401k Saved:%.2f Inflation adjusted 401k: %.2f retirement/private: %.2f"%(four01k_total,four01k_total/inflation,four01k_total/self.principal)
+            except ZeroDivisionError:
+                string4 = "total 401k Saved:%.2f Inflation adjusted 401k: %.2f retirement/private:0"%(four01k_total,four01k_total/inflation)
+            output = output+"\n"+string1+"\n"+string2+"\n"+string3 +"\n"+string4+"\n"
+            one_time_payment = 0
+            debt_money = 0
         return output

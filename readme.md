@@ -14,6 +14,8 @@ Debt money isn't assumed to keep up with inflation. We assume you are performing
 
 All textboxes with a star require input in order to run the app
 
+Because 401ks and roth iras have taxable limits we assume that these payments can't be increased with inflation and will be the same year after year.
+
 # Debt payoff 
 I include an option to enter debts and the speed at which you pay them off. Once this debt is paid off the money once used to pay off the debt is added to your savings.
 

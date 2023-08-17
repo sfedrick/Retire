@@ -1,9 +1,9 @@
 import argparse
 import gradio as gr
 from interest import *
-def compound(principal,age,salary,saving,debt,promotions,windfall,inflation=1.05,returns=1.10,four01k=7500,birth_year = 1998):
+def compound(principal,age,salary,saving,debt,promotions,windfall,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,birth_year = 1998):
     try:
-        savings = Assets(float(principal),float(age),float(salary),float(saving),float(inflation),float(returns),float(four01k),float(birth_year))
+        savings = Assets(float(principal),float(age),float(salary),float(saving),float(inflation),float(returns),float(four01k),float(four01k_total),float(birth_year))
         savings.debt_horizon(debt)
         savings.promotion_extraction(promotions)
         savings.windfall_extraction(windfall)
@@ -25,8 +25,9 @@ def main():
         inflation = gr.Textbox(label="inflation")
         returns = gr.Textbox(label="expected investment returns")
 
-        four01k = gr.Textbox(label="401k contribution this includes employer match this is subtracted from yearly save goal")
-
+        four01k_total = gr.Textbox(label="Principal ammount of 401k")
+        four01k = gr.Textbox(label="401k savings and fixed savings")
+        
         
         
         debt = gr.Dataframe(
@@ -34,7 +35,7 @@ def main():
                 datatype=["str", "number", "number","number"],
                 row_count=3,
                 col_count=(4, "fixed"),
-                label ="Debts please enter your debts. Once a debt is paid off money goes into savings."
+                label ="Debts and fixed savings (enter 0 for principal for fixed saving). Once a debt is paid off money goes into savings."
             )
         promotions = gr.Dataframe(
                 headers=["name","age", "Salary increase post-tax"],
@@ -54,7 +55,7 @@ def main():
         greet_btn = gr.Button("calculate")
         output = gr.Textbox(label="Output Box",allow_flagging="manual",flagging_callback=gr.CSVLogger())
 
-        greet_btn.click(fn=compound, inputs=[principal,age,salary,saving,debt,promotions,windfall,inflation,returns,four01k], outputs=output, api_name="calculate")
+        greet_btn.click(fn=compound, inputs=[principal,age,salary,saving,debt,promotions,windfall,inflation,returns,four01k,four01k_total], outputs=output, api_name="calculate")
 
     demo.demo = gr.Interface(fn=compound, inputs="text", outputs="text")
     demo.launch(share="true") 
