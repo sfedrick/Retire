@@ -2,7 +2,7 @@ import argparse
 import gradio as gr
 from interest import *
 
-def compound(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0):
+def compound(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,savename = "default"):
     
     try:
         float(current_year)
@@ -21,7 +21,16 @@ def compound(principal,age,salary,saving,debt,promotions,windfall,current_year,i
         savings.promotion_extraction(promotions)
         savings.windfall_extraction(windfall)
         return savings.compound_interest()
+def save_inputs(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,save_name = "default"):
+    input_array = [principal,age,salary,saving,debt,promotions,windfall,current_year,inflation,returns,four01k,four01k_total]
+    output =""
+    for item in input_array:
+        if(len(item)==0):
+            item = "empty"
+        output = output + str(item) +"\n"
 
+    return "Saved file "+save_name +" with values : \n"+output
+    pass
 
 def main():
     with gr.Blocks() as demo:
@@ -59,10 +68,15 @@ def main():
                 label ="Please enter a windfall or large payment you made"
                 
             )
-        greet_btn = gr.Button("calculate")
+        load_btn = gr.Dropdown(["file1","file2"],value =["1","2"],multiselect=False, label=" Load Data")
+        calculate_btn = gr.Button("calculate")
         output = gr.Textbox(label="Output Box",allow_flagging="manual",flagging_callback=gr.CSVLogger())
-
-        greet_btn.click(fn=compound, inputs=[principal,age,salary,saving,debt,promotions,windfall,current_year,inflation,returns,four01k,four01k_total], outputs=output, api_name="calculate")
+        save_name = gr.Textbox(label="Save name ")
+        input_array = [principal,age,salary,saving,debt,promotions,windfall,current_year,inflation,returns,four01k,four01k_total,save_name]
+        save_btn = gr.Button("Save Button")
+        output_save = gr.Textbox(label="Save Status",allow_flagging="manual",flagging_callback=gr.CSVLogger())
+        save_btn.click(fn=save_inputs, inputs=input_array, outputs=output_save, api_name="save name")
+        calculate_btn.click(fn=compound, inputs=input_array, outputs=output, api_name="calculate")
 
     demo.launch(share="true") 
 
