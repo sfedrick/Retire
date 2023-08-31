@@ -25,10 +25,33 @@ You can enter anticipated promotions in your career planning.
 # Windfalls 
 You can enter one time payments and windfalls to see if you should really buy that new car or not, or what you should do with the money your Pops left you.
 
+# Load in previous finance scenarios 
+You can now save your results to a csv file and load them in for later to see how well you have kept up with your financial goals and projections. The CSV's get saved to a folder called Saved_Data. The format of the data in the CSV is as follows as an example :
+0 #first row doesn't mean anything it will always be zero
+0 #second row is your starting principle
+25 # third row is your age
+70000 # income after tax
+12000 # ammount saved per year
+"name,Amount,interest,payment_per_month # debt pandas array
+0,54000,1.05,1000
+1,0,0,0
+2,0,0,0"
+"name,age,Salary_increase_post-tax # promotion pandas array
+0,30,12000"
+"name,age,windfall_or_payment #windfall array
+0,0,0" 
+2023 #current year
+1.05 # inflation estimate for years that don't have inflation data in the inflation.csv array
+1.10 # projected returns year over year
+7500 # fixed ammount saved to your 401k each year
+13000 # principal ammount in your 401k 
+
+you can edit these values and load them in to check different scenarios.
+
 # Upcoming features
 I will add a plots of income over time adjusted for inflation.
 
 I will add an auto lynter.
 
-I can't get the flag button to work I will add that as well.
+
 

@@ -7,7 +7,7 @@ import os
 import re
 # global variables 
 save_directory = Assets.save_directory
-
+''' function to save inputs to a csv '''
 def save_inputs(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,save_name = "default"):
     input_array = [principal,age,salary,saving,debt,promotions,windfall,current_year,inflation,returns,four01k,four01k_total]
     output =""
