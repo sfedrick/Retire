@@ -217,6 +217,6 @@ class Assets:
         #windfall
         new_array[6] = pd.read_csv(io.StringIO(new_array[6]))
         new_array[6].fillna(0, inplace=True)
-        
+
         return Assets.compound(*new_array)
         
