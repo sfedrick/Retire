@@ -1,6 +1,11 @@
 import argparse
 import gradio as gr
 from interest import *
+import pandas as pd
+import os
+import numpy as np
+# global variables 
+save_directory = "Saved_Data/"
 
 def compound(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,savename = "default"):
     
@@ -21,19 +26,36 @@ def compound(principal,age,salary,saving,debt,promotions,windfall,current_year,i
         savings.promotion_extraction(promotions)
         savings.windfall_extraction(windfall)
         return savings.compound_interest()
+
 def save_inputs(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,save_name = "default"):
     input_array = [principal,age,salary,saving,debt,promotions,windfall,current_year,inflation,returns,four01k,four01k_total]
     output =""
+    global save_directory
+    df = pd.DataFrame(input_array)
+    df.to_csv(os.path.join(save_directory, save_name), index=False)
+
     for item in input_array:
         if(len(item)==0):
-            item = "empty"
+            item = ""
         output = output + str(item) +"\n"
 
     return "Saved file "+save_name +" with values : \n"+output
     pass
 
+def read_array_from_csv(filename):
+    global save_directory
+    df = pd.read_csv(os.path.join(save_directory, filename))
+    array = np.array(df)
+    return array
+
 def main():
+    global save_directory
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+    choices = os.listdir(save_directory)
+    choices.insert(0, "")
     with gr.Blocks() as demo:
+        load_btn = gr.inputs.Dropdown(choices=choices, label="Load in saved data")
         principal = gr.Textbox(label="Principal*")
         age = gr.Textbox(label="Age*")
         salary = gr.Textbox(label="take home salary*")
@@ -68,7 +90,7 @@ def main():
                 label ="Please enter a windfall or large payment you made"
                 
             )
-        load_btn = gr.Dropdown(["file1","file2"],value =["1","2"],multiselect=False, label=" Load Data")
+        
         calculate_btn = gr.Button("calculate")
         output = gr.Textbox(label="Output Box",allow_flagging="manual",flagging_callback=gr.CSVLogger())
         save_name = gr.Textbox(label="Save name ")
@@ -76,8 +98,10 @@ def main():
         save_btn = gr.Button("Save Button")
         output_save = gr.Textbox(label="Save Status",allow_flagging="manual",flagging_callback=gr.CSVLogger())
         save_btn.click(fn=save_inputs, inputs=input_array, outputs=output_save, api_name="save name")
-        calculate_btn.click(fn=compound, inputs=input_array, outputs=output, api_name="calculate")
-
+        if(load_btn == ""):
+            calculate_btn.click(fn=compound, inputs=input_array, outputs=output, api_name="calculate")
+        else:
+            calculate_btn.click(fn=lambda x: "the load button was clicked", inputs=load_btn, outputs=output, api_name="calculate")
     demo.launch(share="true") 
 
 if __name__ == "__main__":
