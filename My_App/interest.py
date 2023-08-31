@@ -1,7 +1,11 @@
 import pandas as pd
 import pdb
 from datetime import date
+import io
+import numpy as np
+import os
 class Assets:
+    save_directory = "Saved_Data/"
     def __init__(self,principal,age,salary,saving,current_year = -1,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,years=100):
         self.principal = principal + four01k_total
         self.inflation_adjusted_principal = principal
@@ -62,7 +66,7 @@ class Assets:
         row_size = debt.shape[0]
         for i in range(row_size ):
             debt_ammount = float(debt.loc[i,'Amount'])
-            debt_payment = float(debt.loc[i,'payment per month'])
+            debt_payment = float(debt.loc[i,'payment_per_month'])
             debt_interest = float(debt.loc[i,'interest'])
             year_end = self.loan_end(debt_ammount,debt_payment,debt_interest)
             self.debt_money_end.append([year_end+self.current_year,debt_payment])
@@ -78,7 +82,7 @@ class Assets:
         for i in range(row_size ):
             try:
                 promotion_age = float(promotion.loc[i,'age'])
-                promotion_salary = float(promotion.loc[i,'Salary increase post-tax'])
+                promotion_salary = float(promotion.loc[i,'Salary_increase_post-tax'])
                 self.promotion_earnings.append([promotion_age+ self.birth,promotion_salary])
                 print("You have an unused promotion row")
             except ZeroDivisionError:
@@ -94,7 +98,7 @@ class Assets:
         row_size = windfall.shape[0]
         for i in range(row_size):
                 windfall_age = float(windfall.loc[i,'age'])
-                windfall_money= float(windfall.loc[i,'windfall or payment'])
+                windfall_money= float(windfall.loc[i,'windfall_or_payment'])
                 self.windfalls.append([windfall_age+self.birth,windfall_money])
                     
 
@@ -168,3 +172,37 @@ class Assets:
             output = output+"\n"+string1+"\n"+string2+"\n"+string3 +"\n"+string4+"\n"
             
         return output
+    @staticmethod
+    def compound(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,savename = "default"):
+        try:
+            float(current_year)
+        except ValueError:
+            current_year = -1
+        
+        try:
+            savings = Assets(float(principal),float(age),float(salary),float(saving),float(current_year),float(inflation),float(returns),float(four01k),float(four01k_total))
+            savings.debt_horizon(debt)
+            savings.promotion_extraction(promotions)
+            savings.windfall_extraction(windfall)
+            return savings.compound_interest()
+        except ValueError:
+            savings = Assets(float(principal),float(age),float(salary),float(saving),float(current_year))
+            savings.debt_horizon(debt)
+            savings.promotion_extraction(promotions)
+            savings.windfall_extraction(windfall)
+            
+            return savings.compound_interest()
+    @staticmethod
+    def read_array_from_csv(filename):
+        df = pd.read_csv(os.path.join(Assets.save_directory, filename))
+        array = np.array(df)
+        return array
+    
+    @staticmethod
+    def compound_load(filename):
+        input_array = Assets.read_array_from_csv(filename)
+        new_array = []
+        for i,item in enumerate(input_array):
+            new_array.append(str(item[0]))
+        Assets.compound(*new_array)
+        
