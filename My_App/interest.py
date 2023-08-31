@@ -4,6 +4,7 @@ from datetime import date
 import io
 import numpy as np
 import os
+import math
 class Assets:
     save_directory = "Saved_Data/"
     def __init__(self,principal,age,salary,saving,current_year = -1,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,years=100):
@@ -201,8 +202,21 @@ class Assets:
     @staticmethod
     def compound_load(filename):
         input_array = Assets.read_array_from_csv(filename)
+        
         new_array = []
         for i,item in enumerate(input_array):
+            debug =str(item[0])
             new_array.append(str(item[0]))
-        Assets.compound(*new_array)
+        # restructure string read from csv into proper pandas array
+        #debt
+        new_array[4] = pd.read_csv(io.StringIO(new_array[4]))
+        new_array[4].fillna(0, inplace=True)
+        #promotions
+        new_array[5] = pd.read_csv(io.StringIO(new_array[5]))
+        new_array[5].fillna(0, inplace=True)
+        #windfall
+        new_array[6] = pd.read_csv(io.StringIO(new_array[6]))
+        new_array[6].fillna(0, inplace=True)
+        
+        return Assets.compound(*new_array)
         

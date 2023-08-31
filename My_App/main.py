@@ -18,7 +18,7 @@ def save_inputs(principal,age,salary,saving,debt,promotions,windfall,current_yea
     df.to_csv(os.path.join(save_directory, save_name), index=False)
     df = pd.read_csv(os.path.join(save_directory, save_name))
     def replace_spaces_with_comma(text):
-        return re.sub(r'\s+', ',', text)
+        return re.sub(r' +', ',', text)
     df = df.applymap(replace_spaces_with_comma)
     df.to_csv(os.path.join(save_directory, save_name), index=False)
     for item in input_array:
