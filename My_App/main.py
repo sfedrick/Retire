@@ -4,6 +4,7 @@ from interest import *
 import pandas as pd
 import os
 import numpy as np
+import io
 # global variables 
 save_directory = "Saved_Data/"
 
@@ -16,15 +17,32 @@ def compound(principal,age,salary,saving,debt,promotions,windfall,current_year,i
     
     try:
         savings = Assets(float(principal),float(age),float(salary),float(saving),float(current_year),float(inflation),float(returns),float(four01k),float(four01k_total))
-        savings.debt_horizon(debt)
-        savings.promotion_extraction(promotions)
-        savings.windfall_extraction(windfall)
+        try:
+            savings.debt_horizon(debt)
+            savings.promotion_extraction(promotions)
+            savings.windfall_extraction(windfall)
+        except :
+            debt = pd.read_csv(io.StringIO(debt))
+            promotions = pd.read_csv(io.StringIO(promotions))
+            windfall = pd.read_csv(io.StringIO(windfall))
+            savings.debt_horizon(debt)
+            savings.promotion_extraction(promotions)
+            savings.windfall_extraction(windfall)
         return savings.compound_interest()
     except ValueError:
         savings = Assets(float(principal),float(age),float(salary),float(saving),float(current_year))
-        savings.debt_horizon(debt)
-        savings.promotion_extraction(promotions)
-        savings.windfall_extraction(windfall)
+        try:
+            savings.debt_horizon(debt)
+            savings.promotion_extraction(promotions)
+            savings.windfall_extraction(windfall)
+        except: 
+            debt = pd.read_csv(io.StringIO(debt))
+            promotions = pd.read_csv(io.StringIO(promotions))
+            windfall = pd.read_csv(io.StringIO(windfall))
+            savings.debt_horizon(debt)
+            savings.promotion_extraction(promotions)
+            savings.windfall_extraction(windfall)
+
         return savings.compound_interest()
 
 def save_inputs(principal,age,salary,saving,debt,promotions,windfall,current_year,inflation=1.05,returns=1.10,four01k=7500,four01k_total=0,save_name = "default"):
@@ -47,15 +65,23 @@ def read_array_from_csv(filename):
     df = pd.read_csv(os.path.join(save_directory, filename))
     array = np.array(df)
     return array
+def load_inputs(filename):
+    input_array = read_array_from_csv(filename)
+    for i,item in enumerate(input_array):
+        input_array[i]=str(item)
+    return compound(*input_array)
+
+
 
 def main():
     global save_directory
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
     choices = os.listdir(save_directory)
-    choices.insert(0, "")
+    choices.insert(0, "   None   ")
     with gr.Blocks() as demo:
         load_btn = gr.inputs.Dropdown(choices=choices, label="Load in saved data")
+        calculate_btn_loaded = gr.Button("calculate with loaded data ")
         principal = gr.Textbox(label="Principal*")
         age = gr.Textbox(label="Age*")
         salary = gr.Textbox(label="take home salary*")
@@ -98,11 +124,12 @@ def main():
         save_btn = gr.Button("Save Button")
         output_save = gr.Textbox(label="Save Status",allow_flagging="manual",flagging_callback=gr.CSVLogger())
         save_btn.click(fn=save_inputs, inputs=input_array, outputs=output_save, api_name="save name")
-        if(load_btn == ""):
-            calculate_btn.click(fn=compound, inputs=input_array, outputs=output, api_name="calculate")
-        else:
-            calculate_btn.click(fn=lambda x: "the load button was clicked", inputs=load_btn, outputs=output, api_name="calculate")
+        calculate_btn.click(fn=compound, inputs=input_array, outputs=output, api_name="calculate")
+        calculate_btn_loaded.click(fn=load_inputs, inputs=load_btn, outputs=output, api_name="load_calculate")
+        
     demo.launch(share="true") 
+
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
