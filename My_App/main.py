@@ -39,7 +39,7 @@ def main():
     choices = os.listdir(save_directory)
     choices.insert(0, "   None   ")
     with gr.Blocks() as demo:
-        load_btn = gr.inputs.Dropdown(choices=choices, label="Load in saved data")
+        load_btn = gr.Dropdown(choices=choices, label="Load in saved data")
         calculate_btn_loaded = gr.Button("calculate with loaded data ")
         principal = gr.Textbox(label="Principal*")
         age = gr.Textbox(label="Age*")
@@ -75,11 +75,11 @@ def main():
             )
         
         calculate_btn = gr.Button("calculate")
-        output = gr.Textbox(label="Output Box",allow_flagging="manual",flagging_callback=gr.CSVLogger())
+        output = gr.Textbox(label="Output Box")
         save_name = gr.Textbox(label="Save name ")
         input_array = [principal,age,salary,saving,debt,promotions,windfall,current_year,inflation,returns,four01k,four01k_total,save_name]
         save_btn = gr.Button("Save Button")
-        output_save = gr.Textbox(label="Save Status",allow_flagging="manual",flagging_callback=gr.CSVLogger())
+        output_save = gr.Textbox(label="Save Status")
         save_btn.click(fn=save_inputs, inputs=input_array, outputs=output_save, api_name="save name")
         calculate_btn.click(fn=Assets.compound, inputs=input_array, outputs=output, api_name="calculate")
         calculate_btn_loaded.click(fn=Assets.compound_load, inputs=load_btn, outputs=output, api_name="load_calculate")
